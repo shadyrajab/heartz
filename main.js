@@ -26,13 +26,17 @@ client.on('interactionCreate', async interaction => {
     const command = commands.find((command) => command.name === commandName)
     const commandPermission = command.permissions
     const botPermissions = (await guild.members.fetch(client.user.id)).permissionsIn(channel).toArray();
-    console.log(botPermissions)
     if (commandPermission && !botPermissions.find(permission => permission === commandPermission)) {
         return interaction.reply(`Você precisa da permissão de **${commandPermission}** para utilizar este comando.`)
     }
     try {
-        command.execute(interaction)
-    } catch(err) { console.log(err) }
+        await command.execute(interaction)
+    } catch(err) { 
+        await interaction.reply({
+            ephemeral: true,
+            content: `Algum erro impediu este comando de ser utilizado: **${err}**`
+        })
+    }
 })
 
 client.login(process.env.TOKEN)
