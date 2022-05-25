@@ -1,0 +1,38 @@
+const { Client, Intents } = require('discord.js')
+const getCommands = require('./handler/commandHandler')
+require('dotenv').config()
+
+const client = new Client({
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_VOICE_STATES,
+        Intents.FLAGS.GUILD_MEMBERS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Intents.FLAGS.DIRECT_MESSAGES
+    ],
+});
+
+const commands = getCommands(client);
+
+client.on('ready', client => {
+    console.log(`${client.user.username} is online`)
+    client.application.commands.set(commands)
+})
+
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isCommand()) return
+    const { guild, commandName, channel, client } = interaction
+    const command = commands.find((command) => command.name === commandName)
+    const commandPermission = command.permissions
+    const botPermissions = (await guild.members.fetch(client.user.id)).permissionsIn(channel).toArray();
+    console.log(botPermissions)
+    if (commandPermission && !botPermissions.find(permission => permission === commandPermission)) {
+        return interaction.reply(`Você precisa da permissão de **${commandPermission}** para utilizar este comando.`)
+    }
+    try {
+        command.execute(interaction)
+    } catch(err) { console.log(err) }
+})
+
+client.login(process.env.TOKEN)
