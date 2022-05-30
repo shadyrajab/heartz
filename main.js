@@ -1,4 +1,5 @@
 const { Client, Intents } = require('discord.js')
+const mongoose = require('mongoose')
 const getCommands = require('./handler/commandHandler')
 require('dotenv').config()
 
@@ -40,3 +41,6 @@ client.on('interactionCreate', async interaction => {
 })
 
 client.login(process.env.TOKEN)
+mongoose.Promise = global.Promise;
+mongoose.connect(process.env.CONNECTION)
+    .catch((err) => console.log(`Error while connection: ${err}`))
