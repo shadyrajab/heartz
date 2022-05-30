@@ -43,7 +43,7 @@ module.exports = class Warn {
             .setColor(0xf82840)
             .addField(`${vexclaim}︰Infrator: ${member.tag}\n🔧︰ID: ${member.id}\n${valert}︰Motivo: ${reason}`, `📝︰**Warns: ${warns.warns}/5**`, true)
             .setImage('https://i.imgur.com/t6DzVW5.png')
-            .setFooter({text: 'Caso você receba 2 warns, receberá mute de 2 horas automaticamente, já com 5, mute de 1 dia.'})
+            .setFooter({text: '2 warns = 2 horas de mute, 5 warns = 1 dia.'})
         if (warns.warns === 2) {
             await guildMember.timeout(2 * 60 * 60 * 1000, reason)
         }
@@ -51,5 +51,8 @@ module.exports = class Warn {
             await guildMember.timeout(1 * 60 * 60  * 24 *  1000, reason)
         }
         await channel.send({content: `${member}`, embeds: [embed]})
+        await interaction.reply({
+            ephemeral: true,
+            content: `Você enviou um warn para ${member} pelo motivo **${reason}**. Para limpar seu histórico de warn, utilize o comando **/clearwarns**.`})
     }
 }
